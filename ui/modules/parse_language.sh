@@ -3,7 +3,7 @@
 
 #                     LogAnalysis for DSM 7
 #
-#        Copyright (C) 2025 by Tommes | License GNU GPLv3
+#        Copyright (C) 2026 by Tommes | License GNU GPLv3
 #        Member from the  German Synology Community Forum
 #
 # Extract from  GPL3   https://www.gnu.org/licenses/gpl-3.0.html
@@ -36,42 +36,33 @@ function language() {
 	#********************************************************************#
 
 	# Übersetzungstabelle deklarieren
-	declare -A ISO2SYNO
-	ISO2SYNO=( ["de"]="ger" ["en"]="enu" ["zh"]="chs" ["cs"]="csy" ["jp"]="jpn" ["ko"]="krn" ["da"]="dan" ["fr"]="fre" ["it"]="ita" ["nl"]="nld" ["no"]="nor" ["pl"]="plk" ["ru"]="rus" ["sp"]="spn" ["sv"]="sve" ["hu"]="hun" ["tr"]="trk" ["pt"]="ptg" )
-
-	# Standardsprache
-	default_lang="ger"
+	# declare -A ISO2SYNO
+	# ISO2SYNO=( ["de"]="ger" ["en"]="enu" ["zh"]="chs" ["cs"]="csy" ["jp"]="jpn" ["ko"]="krn" ["da"]="dan" ["fr"]="fre" ["it"]="ita" ["nl"]="nld" ["no"]="nor" ["pl"]="plk" ["ru"]="rus" ["sp"]="spn" ["sv"]="sve" ["hu"]="hun" ["tr"]="trk" ["pt"]="ptg" )
 
 	# Script Sprache
 	script_lang=$(/bin/get_key_value /etc/synoinfo.conf maillang)
-	if [ "${script_lang}" == "def" ]; then
-		script_lang="${default_lang}"
+	if [[ "${script_lang}" == "def" ]]; then
+		script_lang="enu"
+	elif [[ "${script_lang}" == "ger" ]]; then
+		script_lang="ger"
+	else
+		script_lang="enu"
 	fi
 
 	# DSM Sprache
 	gui_lang=$(/bin/get_key_value /etc/synoinfo.conf language)
-	if [[ "${gui_lang}" == "def" ]] ; then
-		# Browsersprache ermitteln
-		if [ -n "${HTTP_ACCEPT_LANGUAGE}" ] ; then
-			bl=$(echo ${HTTP_ACCEPT_LANGUAGE} | cut -d "," -f1)
-			bl=${bl:0:2}
-			gui_lang="${ISO2SYNO[${bl}]}"
-		else
-			gui_lang="${default_lang}"
-		fi
+	if [[ "${gui_lang}" == "def" ]]; then
+		gui_lang="enu"
+	elif [[ "${gui_lang}" == "ger" ]]; then
+		gui_lang="ger"
+	else
+		gui_lang="enu"
 	fi
 
 	# Sprachdateien für die GUI laden
 	if [[ "${1}" == "GUI" ]]; then
 		if [ -f "lang/gui/lang_gui_${gui_lang}.txt" ]; then
 			source "lang/gui/lang_gui_${gui_lang}.txt"
-		fi
-	fi
-
-	# Sprachdateien für die Konsole laden
-	if [[ "${1}" == "SCRIPT" ]]; then
-		if [ -f "/var/packages/BasicBackup/target/ui/lang/script/lang_script_${script_lang}.txt" ]; then
-			source "/var/packages/BasicBackup/target/ui/lang/script/lang_script_${script_lang}.txt"
 		fi
 	fi
 }
